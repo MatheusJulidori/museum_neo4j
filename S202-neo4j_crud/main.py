@@ -64,38 +64,71 @@ while 1:
 
     if option == '1':
         name = input('  Name: ')
-        age = input('   Age: ')
-        person = {
-            'name': name,
-            'age': age
-        }
-        aux = dao.create(person)
-        divider()
+        city = input('   City: ')
+        foudationYear = input('   Foundation Year: ')
+        aux = museum.create_museum(name,city,foundationYear)
 
     elif option == '2':
-        aux = dao.read_all_nodes()
-        pp(aux)
-        divider()
+        name = input('  Name: ')
+        year = input('  Year: ')
+        last_inspection = input('  Last Inspection: ')
+        material = input('  Material:  ')
+        artist = input('  Artist  ')
+        museum_name = input('  Museum Name  ')
+        art = Sculpture(name,year,last_inspection,artist,material)
+        aux = museum.create_art(art,museum_name)
 
     elif option == '3':
         name = input('  Name: ')
-        age = input('   Age: ')
-        person = {
-            'name': name,
-            'age': age
-        }
-        
-        aux = dao.update_age(person)
-        divider()
+        year = input('  Year: ')
+        last_inspection = input('  Last Inspection: ')
+        technic = input('  Technic:  ')
+        artist = input('  Artist  ')
+        museum_name = input('  Museum Name  ')
+        art = Painting(name,year,last_inspection,artist,technic)
+        aux = museum.create_art(art,museum_name)
 
     elif option == '4':
         name = input('  Name: ')
-        person = {
-            'name': name
-        }
-        
-        aux = dao.delete(person)
+        aux = museum.read_sculpture_by_name(name)
+        print(aux)
         divider()
+
+    elif option == '5':
+        name = input('  Name: ')
+        aux = museum.read_painting_by_name(name)
+        print(aux)
+        divider()
+
+    elif option == '6':
+        aux = museum.read_all_nodes()
+        print(aux)
+        divider()
+
+    elif option == '7':
+        name = input('  Name: ')
+        new_inspection = input('  New Inspection:  ')
+        aux = museum.update_sculpture_last_inspection(name,new_inspection)
+        print(aux)
+        divider()
+
+    elif option == '8':
+        name = input('  Name: ')
+        new_inspection = input('  New Inspection:  ')
+        aux = museum.update_painting_last_inspection(name,new_inspection)
+        print(aux)
+        divider()
+
+    elif option == '9':
+        name = input('  Name: ')
+        aux = museum.delete_sculpture(name)
+
+    elif option == '10':
+        name = input('  Name: ')
+        aux = museum.delete_painting(name)
+
+    elif option == '11':
+        aux = museum.delete_all_nodes()
 
     else:
         break
