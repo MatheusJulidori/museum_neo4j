@@ -1,6 +1,6 @@
 from pprintpp import pprint as pp
 from db.database import Graph
-from art import Sculpture,Paiting
+from art import Sculpture,Painting
 
 class Museum(object):
     def __init__(self):
@@ -12,16 +12,12 @@ class Museum(object):
 
     def create_art(self, art ,museum_name):
         if isinstance(art,Sculpture):
-            query = self.db.execute_query('CREATE (n:Sculpture {name:$name, year:$year, last_inspection:$last_inspection,material:$material, artist:$artist}) return n',
-            {'name': art['name'], 'year': art['year'],'last_inspection':art['last_inspection'],'material':art['material'],'artist':art['artist'] })
-            self.db.execute_query('MATCH (m:Museum {name:$name}), (s:Sculpture {nameS:$nameS}) CREATE (m)-[:CONTAINS]->(s)',
-            {'name': museum_name, 'nameS': art['name']})
+            self.db.execute_query('CREATE (n:Sculpture {name:$name, year:$year, last_inspection:$last_inspection,material:$material, artist:$artist}) return n',{'name': art.name, 'year': art.year,'last_inspection':art.last_inspection,'material':art.material,'artist':art.artist })
+            return "OK S"
 
         else:
-            query = self.db.execute_query('CREATE (n:Painting {name:$name, year:$year, last_inspection:$last_inspection,technic:$technic, artist:$artist}) return n',
-            {'name': art['name'], 'year': art['year'],'last_inspection':art['last_inspection'],'technic':art['technic'],'artist':art['artist'] })
-            self.db.execute_query('MATCH (m:Museum {name:$name}), (p:Paiting {nameP:$nameP}) CREATE (m)-[:CONTAINS]->(p)',
-            {'name': museum_name, 'nameP': art['name']})
+            self.db.execute_query('CREATE (n:Painting {name:$name, year:$year, last_inspection:$last_inspection,technic:$technic, artist:$artist}) return n',{'name': art.name, 'year': art.year,'last_inspection':art.last_inspection,'technic':art.technic,'artist':art.artist })
+            return "OK P"
         
 
     def read_painting_by_name(self, name):
@@ -36,7 +32,7 @@ class Museum(object):
         return self.db.execute_query('MATCH (n) RETURN n')
 
     def update_painting_last_inspection(self, name, new_inspection):
-        return self.db.execute_query('MATCH (n:Paiting {name:$name}) SET n.last_inspection = $new_inspection RETURN n',
+        return self.db.execute_query('MATCH (n:Painting {name:$name}) SET n.last_inspection = $new_inspection RETURN n',
                                      {'name': name, 'new_inspection': new_inspection})
 
     def update_sculpture_last_inspection(self, name, new_inspection):
@@ -54,18 +50,25 @@ class Museum(object):
     def delete_all_nodes(self):
         return self.db.execute_query('MATCH (n) DETACH DELETE n')
 
+    def create_relation(self,art_type,art_name,museum_name):
+        if art_type == '1':
+            self.db.execute_query('MATCH (m:Museum {name:$museum_name}), (s:Sculpture {name:$name}) CREATE (m)-[:CONTAINS]->(s)',{'museum_name': museum_name, 'name': art_name})
+        else:
+            self.db.execute_query('MATCH (m:Museum {name:$museum_name}), (p:Painting {name:$name}) CREATE (m)-[:CONTAINS]->(p)',{'museum_name': museum_name, 'name': art_name})
+
+
 def divider():
     print('\n' + '-' * 80 + '\n')
 
 museum = Museum()
 
 while 1:    
-    option = input('1. Create Museum\n2. Create Sculpture\n3. Create Painting\n4. Read Sculpture\n5. Read Painting\n6. Read all nodes\n7. Update Sculpture\n8. Update Painting\n9. Delete Sculpture\n10. Delete Painting\n11. Delete all nodes\n')
+    option = input('1. Create Museum\n2. Create Sculpture\n3. Create Painting\n4. Read Sculpture\n5. Read Painting\n6. Read all nodes\n7. Update Sculpture\n8. Update Painting\n9. Delete Sculpture\n10. Delete Painting\n11. Delete all nodes\n12. Create relation\n')
 
     if option == '1':
         name = input('  Name: ')
-        city = input('   City: ')
-        foudationYear = input('   Foundation Year: ')
+        city = input('  City: ')
+        foundationYear = input('  Foundation Year: ')
         aux = museum.create_museum(name,city,foundationYear)
 
     elif option == '2':
@@ -73,8 +76,8 @@ while 1:
         year = input('  Year: ')
         last_inspection = input('  Last Inspection: ')
         material = input('  Material:  ')
-        artist = input('  Artist  ')
-        museum_name = input('  Museum Name  ')
+        artist = input('  Artist:  ')
+        museum_name = input('  Museum Name:  ')
         art = Sculpture(name,year,last_inspection,artist,material)
         aux = museum.create_art(art,museum_name)
 
@@ -83,8 +86,8 @@ while 1:
         year = input('  Year: ')
         last_inspection = input('  Last Inspection: ')
         technic = input('  Technic:  ')
-        artist = input('  Artist  ')
-        museum_name = input('  Museum Name  ')
+        artist = input('  Artist:  ')
+        museum_name = input('  Museum Name:  ')
         art = Painting(name,year,last_inspection,artist,technic)
         aux = museum.create_art(art,museum_name)
 
@@ -129,6 +132,12 @@ while 1:
 
     elif option == '11':
         aux = museum.delete_all_nodes()
+
+    elif option == '12':
+        art_type = input('  Art type(1 - Sculpture, 2-Painting):  ')
+        art_name = input('  Art name:  ')
+        museum_name = input('  Museum name:  ')
+        aux = museum.create_relation(art_type,art_name,museum_name)
 
     else:
         break
