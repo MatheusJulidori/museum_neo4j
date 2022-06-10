@@ -10,14 +10,12 @@ class Museum(object):
         return self.db.execute_query('CREATE (n:Museum {name:$name, city:$city, foundationYear:$foundationYear}) return n',
                                      {'name': name, 'city': city,'foundationYear':foundationYear })
 
-    def create_art(self, art ,museum_name):
+    def create_art(self, art):
         if isinstance(art,Sculpture):
             self.db.execute_query('CREATE (n:Sculpture {name:$name, year:$year, last_inspection:$last_inspection,material:$material, artist:$artist}) return n',{'name': art.name, 'year': art.year,'last_inspection':art.last_inspection,'material':art.material,'artist':art.artist })
-            return "OK S"
 
         else:
             self.db.execute_query('CREATE (n:Painting {name:$name, year:$year, last_inspection:$last_inspection,technic:$technic, artist:$artist}) return n',{'name': art.name, 'year': art.year,'last_inspection':art.last_inspection,'technic':art.technic,'artist':art.artist })
-            return "OK P"
         
 
     def read_painting_by_name(self, name):
@@ -63,7 +61,7 @@ def divider():
 museum = Museum()
 
 while 1:    
-    option = input('1. Create Museum\n2. Create Sculpture\n3. Create Painting\n4. Read Sculpture\n5. Read Painting\n6. Read all nodes\n7. Update Sculpture\n8. Update Painting\n9. Delete Sculpture\n10. Delete Painting\n11. Delete all nodes\n12. Create relation\n')
+    option = input('1. Create Museum\n2. Create Sculpture\n3. Create Painting\n4. Create relation\n5. Read Sculpture\n6. Read Painting\n7. Read all nodes\n8. Update Sculpture\n9. Update Painting\n10. Delete Sculpture\n11. Delete Painting\n12. Delete all nodes\n')
 
     if option == '1':
         name = input('  Name: ')
@@ -77,9 +75,8 @@ while 1:
         last_inspection = input('  Last Inspection: ')
         material = input('  Material:  ')
         artist = input('  Artist:  ')
-        museum_name = input('  Museum Name:  ')
         art = Sculpture(name,year,last_inspection,artist,material)
-        aux = museum.create_art(art,museum_name)
+        aux = museum.create_art(art)
 
     elif option == '3':
         name = input('  Name: ')
@@ -87,59 +84,58 @@ while 1:
         last_inspection = input('  Last Inspection: ')
         technic = input('  Technic:  ')
         artist = input('  Artist:  ')
-        museum_name = input('  Museum Name:  ')
         art = Painting(name,year,last_inspection,artist,technic)
-        aux = museum.create_art(art,museum_name)
+        aux = museum.create_art(art)
 
     elif option == '4':
+        art_type = input('  Art type(1 - Sculpture, 2-Painting):  ')
+        art_name = input('  Art name:  ')
+        museum_name = input('  Museum name:  ')
+        aux = museum.create_relation(art_type,art_name,museum_name)
+
+    elif option == '5':
         name = input('  Name: ')
         aux = museum.read_sculpture_by_name(name)
         print(aux)
         divider()
 
-    elif option == '5':
+    elif option == '6':
         name = input('  Name: ')
         aux = museum.read_painting_by_name(name)
         print(aux)
         divider()
 
-    elif option == '6':
-        aux = museum.read_all_nodes()
-        print(aux)
-        divider()
-
     elif option == '7':
-        name = input('  Name: ')
-        new_inspection = input('  New Inspection:  ')
-        aux = museum.update_sculpture_last_inspection(name,new_inspection)
+        aux = museum.read_all_nodes()
         print(aux)
         divider()
 
     elif option == '8':
         name = input('  Name: ')
         new_inspection = input('  New Inspection:  ')
-        aux = museum.update_painting_last_inspection(name,new_inspection)
+        aux = museum.update_sculpture_last_inspection(name,new_inspection)
         print(aux)
         divider()
 
     elif option == '9':
         name = input('  Name: ')
-        aux = museum.delete_sculpture(name)
+        new_inspection = input('  New Inspection:  ')
+        aux = museum.update_painting_last_inspection(name,new_inspection)
+        print(aux)
+        divider()
 
     elif option == '10':
         name = input('  Name: ')
-        aux = museum.delete_painting(name)
+        aux = museum.delete_sculpture(name)
 
     elif option == '11':
-        aux = museum.delete_all_nodes()
+        name = input('  Name: ')
+        aux = museum.delete_painting(name)
 
     elif option == '12':
-        art_type = input('  Art type(1 - Sculpture, 2-Painting):  ')
-        art_name = input('  Art name:  ')
-        museum_name = input('  Museum name:  ')
-        aux = museum.create_relation(art_type,art_name,museum_name)
+        aux = museum.delete_all_nodes()
 
     else:
         break
 
-dao.db.close()
+museum.db.close()
